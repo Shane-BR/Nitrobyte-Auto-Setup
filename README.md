@@ -10,20 +10,13 @@ This project is an automated installer script written in Python. It uses the `py
 - Waits until the current program is finished installing before closing it.
 - Changes the resolution back to the original after all installations are complete.
 
-## Requirements
-
-- Python 3
-- `pyautogui`
-- `win32api`
-- `win32con`
-- `pywintypes`
-
 ## Usage
 
 You can run the script with optional command line arguments to specify the button search time and the output width and height. If not specified, the button search time defaults to 5 seconds, and the output width and height default to 1280x1024.
 
 ```bash
 ./main.exe [button_search_time] [op_width] [op_height]
+```
 
 ## The paths.txt File
 

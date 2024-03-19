@@ -9,7 +9,7 @@ from pathlib import Path
 from time import sleep
 
 # Allows the first arg to assign an amount of time to search for the buttons before failing
-button_search_time = int(argv[1]) if len(argv) > 1 and argv[1].isdigit else 3
+button_search_time = int(argv[1]) if len(argv) > 1 and argv[1].isdigit else 5
 op_width = int(argv[2]) if len(argv) > 2 and argv[2].isdigit else 1280
 op_height = int(argv[3]) if len(argv) > 3 and argv[3].isdigit else 1024
 
@@ -23,17 +23,16 @@ def main ():
 
     paths = open("paths.txt").read().split("\n")
     for i in range(len(paths)):
-        paths[i] = paths[i].split(" ") # TODO remove
         try:
-            print("Launching: " + paths[i][0])
-            process = Popen([paths[i][0]])
+            print("Launching: " + paths[i])
+            process = Popen([paths[i]])
 
-            filename = Path(paths[i][0]).stem
+            filename = Path(paths[i]).stem
 
             navigateInstaller(filename)
 
         except:
-            print("Unable to launch: " + paths[i][0])
+            print("Unable to launch: " + paths[i])
 
     # wait until current program is finished then close it
     # current then equals next opened program
@@ -42,19 +41,17 @@ def main ():
     while True:
         processes_running = 0
         for i in range(len(paths)):
-            process = Path(paths[i][0]).name
+            process = Path(paths[i]).name
             if (isProcessRunning(process)):
                 # is there a finish button?
                 finish_button_img_path = "resources/" + process.split(".")[0] + "/finish.PNG"
-                if (button := pyautogui.locateOnScreen(finish_button_img_path, minSearchTime=button_search_time)) != None:
-                    pyautogui.click(button)
+                if pyautogui.locateOnScreen(finish_button_img_path, minSearchTime=button_search_time) != None:
+                    Popen("taskkill /im " + process)
                 else:
                     processes_running += 1
 
         if processes_running == 0:
             break
-
-
 
 
     # change resolution back to original
@@ -69,8 +66,7 @@ def navigateInstaller(filename):
     step = 1
     base_path = "resources/" + filename
     while (button := pyautogui.locateOnScreen(base_path + "/" + str(step) + ".PNG", minSearchTime=button_search_time)) != None:
-        pyautogui.moveTo(button)
-        sleep(5)
+        pyautogui.click(button)
         step += 1
     
 def setWindowsResolution(width, height):

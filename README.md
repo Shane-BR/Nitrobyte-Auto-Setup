@@ -12,7 +12,7 @@ This project is an automated installer script written in Python. It uses the `py
 
 ## Usage
 
-You can run the script with optional command line arguments to specify the button search time and the output width and height. If not specified, the button search time defaults to 5 seconds, and the output width and height default to 1280x1024.
+You can run the script with optional command line arguments to specify the button search time and the output width and height. If not specified, the button search time defaults to 60 seconds, and the output width and height default to 1280x1024.
 
 ```bash
 ./main.exe [button_search_time] [op_width] [op_height]

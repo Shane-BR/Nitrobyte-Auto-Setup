@@ -19,6 +19,9 @@ init_height = win32api.GetSystemMetrics(1)
 
 def main ():
 
+    # Turn off pyautogui exceptions
+    pyautogui.useImageNotFoundException(False)
+
     # change os resolution to fit the given screenshots
     setWindowsResolution(op_width, op_height)
 
@@ -33,8 +36,8 @@ def main ():
 
                 navigateInstaller(filename)
 
-            except:
-                print("Unable to launch: " + paths[i])
+            except Exception as exc:
+                print("An error occurred with process: " + paths[i] + ": " + str(exc))
 
         # wait until current program is finished then close it
         # current then equals next opened program
@@ -58,7 +61,8 @@ def main ():
 
         # change resolution back to original
         setWindowsResolution(init_width, init_height)   
-    except:
+    except Exception as exc:
+        print("An error occurred with the main process: " + str(exc))
         setWindowsResolution(init_width, init_height) 
 
 def navigateInstaller(filename):
@@ -72,11 +76,17 @@ def navigateInstaller(filename):
     while (button := pyautogui.locateOnScreen(base_path + "/" + str(step) + ".PNG", minSearchTime=button_search_time)) != None:
         
         # Halt if any "wait" images are seen
+        skip = False
         for file in listdir(base_path):
-            if (file.startsWith("wait") and file.endsWith(".PNG")):
-                if (pyautogui.locateAll(file) != None):
+            if (file.startswith("wait") and file.endswith(".PNG")):
+                full_path = base_path + "/" + file
+                if pyautogui.locateOnScreen(full_path) != None:
+                    skip = True
                     break
         
+        if (skip): 
+            continue
+
         pyautogui.click(button)
         pyautogui.moveTo(0, 0)
         step += 1

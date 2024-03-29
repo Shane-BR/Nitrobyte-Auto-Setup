@@ -2,7 +2,7 @@ import pyautogui
 import win32api
 import win32con
 
-from os import listdir
+from os import listdir, path
 from pywintypes import DEVMODEType
 from sys import argv
 from subprocess import Popen, check_output
@@ -73,23 +73,26 @@ def navigateInstaller(filename):
     # press each button png in step order
     step = 1
     base_path = "resources/" + filename
-    while (button := pyautogui.locateOnScreen(base_path + "/" + str(step) + ".PNG", minSearchTime=button_search_time)) != None:
+    while path.isfile(step_file := base_path + "/" + str(step) + ".PNG"):
         
         # Halt if any "wait" images are seen
         skip = False
         for file in listdir(base_path):
             if (file.startswith("wait") and file.endswith(".PNG")):
-                full_path = base_path + "/" + file
-                if pyautogui.locateOnScreen(full_path) != None:
+                wpath = base_path + "/" + file
+                if pyautogui.locateOnScreen(wpath) != None:
                     skip = True
                     break
         
         if (skip): 
             continue
 
-        pyautogui.click(button)
-        pyautogui.moveTo(0, 0)
-        step += 1
+        sleep(0.25)
+
+        if (button := pyautogui.locateOnScreen(step_file, minSearchTime=button_search_time)) != None:
+            pyautogui.click(button)
+            pyautogui.moveTo(op_width/2, 0)
+            step += 1
     
 def setWindowsResolution(width, height):
     devmode = DEVMODEType()

@@ -2,14 +2,14 @@
 
 This script silently installs programs from a list (paths.txt) on Windows systems only.
 
-Pre-built Executable:
+### Pre-built Executable:
 
-If you don't want to build the script yourself, download the pre-compiled executable (.exe file) from the Releases tab! This eliminates the need for Python on your system.
+    If you don't want to build the script yourself, download the pre-compiled executable (.exe file) from the Releases tab! This eliminates the need for Python on your system.
 
 ## Building from Source (Python 3 Required):
 
     Install Python 3.x (https://www.python.org/downloads/)
-    Run: python silent_installer.py
+    Run: python main.py
 
 ## Using paths.txt:
 

@@ -8,7 +8,7 @@ def main ():
 
     # CMD ARGS
     args = get_args()
-    loading_type = args.get("--loadingtype")
+    loading_type = args.get("--loading_type")
     sequential_loading = args.get("--seq") != None # MSI files will always wait for the last MSI file to finish
     path_file_arg = args.get("--path_file")
     path_file = path_file_arg if path_file_arg != None else "paths.txt"

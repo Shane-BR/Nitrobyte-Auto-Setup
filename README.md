@@ -1,28 +1,37 @@
-# Automated Installer
+# Silent Installer (Windows Only)
 
-This project is an automated installer script written in Python. It uses the `pyautogui` and `win32api` libraries to interact with the operating system and automate the installation of multiple programs.
+This script silently installs programs from a list (paths.txt) on Windows systems only.
 
-## Features
+### Pre-built Executable:
 
-- Changes the OS resolution to fit the given screenshots.
-- Launches each program listed in a text file.
-- Navigates through each installer by clicking buttons identified by screenshots.
-- Waits until the current program is finished installing before closing it.
-- Changes the resolution back to the original after all installations are complete.
+If you don't want to build the script yourself, download the pre-compiled executable (.exe file) from the Releases tab! This eliminates the need for Python on your system.
 
-## Usage
+## Building from Source (Python 3 Required):
 
-You can run the script with optional command line arguments to specify the button search time and the output width and height. If not specified, the button search time defaults to 60 seconds, and the output width and height default to 1280x1024.
+- Install Python 3.x (https://www.python.org/downloads/)
+- Run: python main.py
 
-```bash
-./main.exe [button_search_time] [op_width] [op_height]
-```
+## Using paths.txt:
 
-## The paths.txt File
+Create a text file named paths.txt in the same directory as the script or executable.
+In paths.txt, enter the absolute path to each program you want to install silently, one path per line. An absolute path includes the full drive letter, folder structure, and filename (e.g., C:\Program Files\Example\setup.exe).
 
-The `paths.txt` file is a crucial part of this project. It contains the file paths to the installers that the script will automate. Each path should be on a new line. Here's an example of what the `paths.txt` file might look like:
+## Example paths.txt:
 
-```plaintext
-C:/Users/user/Downloads/installer1.exe
-C:/Users/user/Downloads/installer2.exe
-C:/Users/user/Downloads/installer3.exe
+    C:\Program Files\Example\setup.exe
+    D:\Games\AwesomeGame\Installer.msi
+
+## Features:
+
+- Progress bar with status for each program.
+- Summary at the end.
+- Handles MSI and executable installers.
+
+### Notes:
+
+Silent installs may bypass prompts. Verify paths in paths.txt are correct and that you have permission to install the programs.
+Script may not display progress correctly everywhere.
+
+### Disclaimer:
+
+Use at your own risk. Ensure permissions and program compatibility.

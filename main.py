@@ -1,9 +1,7 @@
 import os
 import sys
 import json
-from winsound import Beep
 from subprocess import Popen, call
-from pathlib import Path
 from time import sleep
 
 def main ():

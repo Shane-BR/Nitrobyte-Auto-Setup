@@ -1,1 +1,1 @@
-pyinstaller -F main.py
+pyinstaller -F --add-data "loading_types.json;." main.py

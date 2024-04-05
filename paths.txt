@@ -1,11 +1,1 @@
-551.61-desktop-win10-win11-64bit-international-dch-whql.exe
-benchmark-launcher-3.1.0-windows\benchmark-launcher.exe
-blender-4.0.1-windows-x64.msi
-CapFrameX_v1.7.1_Setup\CapFrameXBootstrapper.exe
-CrystalDiskInfo8_17_14.exe
-EpicInstaller-15.17.1.msi
-Geekbench-6.2.2-WindowsSetup.exe
-HPSupportSolutionsFramework-12.19.48.1.exe
-hwmonitor_1.51.exe
-SteamSetup.exe
-Unigine_Heaven-4.0.exe
+ADD PATHS TO INSTALLERS

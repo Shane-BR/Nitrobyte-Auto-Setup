@@ -1,0 +1,53 @@
+{
+    "spinning_bar" : "|/-\\",
+    "straight_bar" : [
+        "[        ]",
+        "[=       ]",
+        "[===     ]",
+        "[====    ]",
+        "[=====   ]",
+        "[======  ]",
+        "[======= ]",
+        "[========]",
+        "[ =======]",
+        "[  ======]",
+        "[   =====]",
+        "[    ====]",
+        "[     ===]",
+        "[      ==]",
+        "[       =]",
+        "[        ]",
+        "[        ]"
+    ],
+
+    "jumping_letters" : [
+        "Loading", 
+        "lOading", 
+        "loAding", 
+        "loaDing", 
+        "loadIng", 
+        "loadiNg", 
+        "loadinG",
+        "loadiNg",
+        "loadIng",
+        "loaDing",
+        "loAding",
+        "lOading"    
+    ],
+
+    "expanding_letters" : [
+        "              LOADING              ",
+        "             L OADIN G             ",
+        "            L O ADI N G            ",
+        "           L O A D I N G           ",
+        "        L  O  A  D  I  N  G        ",
+        "     L   O   A   D   I   N   G     ",
+        "  L    O    A    D    I    N    G  ",
+        "  L    O    A    D    I    N    G  ",
+        "  L    O    A    D    I    N    G  ",
+        "     L   O   A   D   I   N   G     ",  
+        "        L  O  A  D  I  N  G        ",
+        "           L O A D I N G           ",
+        "             L OADIN G             "
+    ]
+}

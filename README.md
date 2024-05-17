@@ -1,37 +1,54 @@
-# Silent Installer (Windows Only)
+# Nitrobyte Auto Installer
+This script automates the installation of multiple programs from a provided list.
 
-This script silently installs programs from a list (paths.txt) on Windows systems only.
+Features
 
-### Pre-built Executable:
+- Installs programs sequentially or concurrently based on arguments.
+- Provides visual feedback during installation with loading animations.
+- Handles MSI and non-MSI installers.
+- Detects installation errors and provides exit codes.
+- Optionally prompts for a system restart after installation.
 
-If you don't want to build the script yourself, download the pre-compiled executable (.exe file) from the Releases tab! This eliminates the need for Python on your system.
+## Usage
 
-## Building from Source (Python 3 Required):
+### Paths file:
 
-- Install Python 3.x (https://www.python.org/downloads/)
-- Run: python main.py
+This script reads a text file containing a list of installer paths, allowing you to manage installers in a separate location.
 
-## Using paths.txt:
+- Create a text file named paths.txt (or use a different name with the --path_file argument) in the same directory as the script (or a specified location).
+- List each installer path on a separate line in the paths.txt file.
 
-Create a text file named paths.txt in the same directory as the script or executable.
-In paths.txt, enter the absolute path to each program you want to install silently, one path per line. An absolute path includes the full drive letter, folder structure, and filename (e.g., C:\Program Files\Example\setup.exe).
+### Using the Python script directly:
+- Create paths file (See above).
+- Run the script: Open a terminal or command prompt and navigate to the directory containing the script and installers. Run the script with the following command:
 
-## Example paths.txt:
+    python script.py [arguments]
 
-    C:\Program Files\Example\setup.exe
-    D:\Games\AwesomeGame\Installer.msi
+### Using a compiled executable:
+- Create paths file (See above)
+- Double-click the executable file to run the installer. You may be prompted for administrator privileges.
+- Arguments: The executable functions identically to the script and accepts the same command-line arguments described below.
 
-## Features:
+## Arguments:
 
-- Progress bar with status for each program.
-- Summary at the end.
-- Handles MSI and executable installers.
+    --loading_type: Specify the loading animation type (options defined in loading_types.json). Defaults to "spinning_bar".
+    --seq: Force sequential installation (each program waits for the previous to finish).
+    --path_file: Specify a custom path file containing installer paths (defaults to "paths.txt").
 
-### Notes:
+## Example: 
+Install programs sequentially with a custom loading animation:
 
-Silent installs may bypass prompts. Verify paths in paths.txt are correct and that you have permission to install the programs.
-Script may not display progress correctly everywhere.
+    python main.py --loading_type=straight_bar --seq
+    executable.exe --loading_type=straight_bar --seq
 
-### Disclaimer:
+Note: Script requires administrator privileges to run installers.
 
-Use at your own risk. Ensure permissions and program compatibility.
+## Dependencies
+
+    Python 3
+
+## Exit Codes
+
+    0: Successful installation of all programs.
+    1: Error during script execution.
+    Non-zero (returned by installer): Installation failure of a specific program.

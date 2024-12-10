@@ -9,9 +9,9 @@ def main ():
     # CMD ARGS
     args = get_args()
     loading_type = args.get("--loading_type")
-    sequential_loading = args.get("--seq") != None # MSI files will always wait for the last MSI file to finish
+    sequential_loading = args.get("--seq") is not None # MSI files will always wait for the last MSI file to finish
     path_file_arg = args.get("--path_file")
-    path_file = path_file_arg if path_file_arg != None else "paths.txt"
+    path_file = path_file_arg if path_file_arg is not None else "paths.txt"
 
     os.system("") # needed for ANSI escape codes ¯\_(ツ)_/¯
 
@@ -51,21 +51,21 @@ def main ():
             name = os.path.basename(key)
             process = processes[key]
 
-            if process == None:
+            if process is None:
                 print(name + " - \033[1;36m Waiting" + "."*(1+(loading_index%3)) + "\033[0m \033[K") # dumb fix - color bleeding onto other text for some reason
                 continue
 
             process.poll()
             loading_sym = syms[loading_index % len(syms)]
 
-            if process.returncode == None:
+            if process.returncode is None:
                 print(name + " - \033[34;1m" + loading_sym + "\033[K")
                 cur_loading = True
 
                 if is_msi(key):
                     msi_running = True
 
-            elif process.returncode != 0:
+            elif process.returncode is not 0:
                 print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
                 install_fails += 1
             else:
@@ -116,7 +116,7 @@ def get_args():
 
     return args
 
-def get_loading_type(type):
+def get_loading_type(t):
     try:
         base_path = sys._MEIPASS
     except:
@@ -124,14 +124,14 @@ def get_loading_type(type):
 
     loading_options = json.loads(open(os.path.join(base_path, "loading_types.json")).read())
     
-    if type != None and type in loading_options:
-        return loading_options[type]
+    if t is not None and t in loading_options:
+        return loading_options[t]
     
     return loading_options["spinning_bar"]
 
 
 def new_process(path):
-    return Popen('msiexec.exe /i "{}" /qn '.format(os.path.abspath(path))) if path.endswith("msi") else Popen(path + " /S /s /silent /verysilent -qn -s /norestart")
+    return Popen('msiexec.exe /i "{}" /qn'.format(os.path.abspath(path))) if path.endswith("msi") else Popen(path + " /S /s /v /qn /silent /verysilent -qn -s /norestart")
 
 def is_msi(path):
     return os.path.basename(path).endswith("msi")

@@ -131,7 +131,7 @@ def get_loading_type(t):
 
 
 def new_process(path):
-    return Popen('msiexec.exe /i "{}" /qn'.format(os.path.abspath(path))) if path.endswith("msi") else Popen(path + " /S /s /v /qn /silent /verysilent -qn -s /norestart")
+    return Popen('msiexec.exe /i "{}" /qn'.format(os.path.abspath(path))) if path.endswith("msi") else Popen(path + " /S /s /silent /verysilent -qn -s /norestart")
 
 def is_msi(path):
     return os.path.basename(path).endswith("msi")

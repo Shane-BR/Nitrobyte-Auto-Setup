@@ -1,8 +1,11 @@
-import os
-import sys
 import json
+import os
 from subprocess import Popen, call
+import sys
 from time import sleep
+
+SILENT_PARAMS = "/s /S -s /q -q /silent -silent /unattended -unattended /quiet -quiet /veryquiet -veryquiet"
+NO_RESTART_PARAM = "/norestart"
 
 def main ():
 
@@ -76,9 +79,9 @@ def main ():
             # Find next waiting process
             for key in processes: # key = the path to the installer
 
-                handle_msi = is_msi(key) if cur_loading else True
+                handle_next = is_msi(key) if cur_loading else True
 
-                if processes[key] == None and handle_msi:
+                if processes[key] is None and handle_next:
                     processes[key] = new_process(key)
                     cur_loading = True
                     break
@@ -131,7 +134,39 @@ def get_loading_type(t):
 
 
 def new_process(path):
-    return Popen('msiexec.exe /i "{}" /qn'.format(os.path.abspath(path))) if path.endswith("msi") else Popen(path + " /S /s /silent /verysilent -qn -s /norestart")
+    msi = is_msi(path)
+    process = Popen('msiexec.exe /i "{}" /qn /norestart'.format(os.path.abspath(path))) if msi else Popen(path + " " + SILENT_PARAMS + " " + NO_RESTART_PARAM) # Initial brute force approach
+    return process
+
+def retry_process(process):
+    params = SILENT_PARAMS.split(" ")
+    no_reboot = True
+
+    while True:
+        # Run through each param with the /noreboot added and then again without it
+        for param in params:
+            if process.returncode is not 87:
+                return process
+
+            r = NO_RESTART_PARAM if no_reboot else ""
+            p = Popen(str(process.args).split(" ")[0] + " " + param + " " + r)
+
+            process = p
+
+            sleep(0.05)
+
+        if no_reboot:
+            no_reboot = False
+        else:
+            break
+
+    return process
+        
+
+
+        
+
+        
 
 def is_msi(path):
     return os.path.basename(path).endswith("msi")

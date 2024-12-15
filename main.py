@@ -44,6 +44,7 @@ def main ():
         cur_loading = False
         msi_running = False
         install_fails = 0
+        attempted_retries = []
 
 
         print("\033[H", end="")
@@ -69,8 +70,16 @@ def main ():
                     msi_running = True
 
             elif process.returncode is not 0:
-                print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
-                install_fails += 1
+                p = process
+                if process.returncode is 87:
+                    p = retry_process(process)
+
+                if p is None:
+                    print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
+                    install_fails += 1
+                else:
+                    process = p
+                    cur_loading = True
             else:
                 print(name + " - \033[1;32m DONE\033[K")
 
@@ -160,7 +169,7 @@ def retry_process(process):
         else:
             break
 
-    return process
+    return None
         
 
 

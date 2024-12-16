@@ -71,10 +71,15 @@ def main ():
 
             elif process.returncode is 87: # Incorrect params
                 # Retry with reduced params
-                processes[key] = new_process(key, get_next_params(process))
-                print(name + " - \033[34;1m" + loading_sym + "\033[K")
-                print("\033[J", end="")
-                cur_loading = True
+                p = get_next_params(process)
+                if p is not None:
+                    processes[key] = new_process(key, p)
+                    print(name + " - \033[34;1m" + loading_sym + "\033[K")
+                    print("\033[J", end="")
+                    cur_loading = True
+                else:
+                    print(name + " - \033[1;31m ERR ({}) Failed Retry\033[K".format(process.returncode))
+                    install_fails += 1 
 
             elif process.returncode is not 0:
                 print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
@@ -155,24 +160,28 @@ def get_next_params(process):
 
     # Has all silent params with or without /norestart
     equal_silent = True
+    has_no_reboot = NO_RESTART_PARAM in cur_params
+    suffix = ((" " + NO_RESTART_PARAM) if has_no_reboot else "")
     for p in SILENT_PARAMS:
         if p not in cur_params:
             equal_silent = False
 
     if equal_silent:
         # Take first param in the list and return it
-        return SILENT_PARAMS[0]
-    elif (p := cur_params[0]) in SILENT_PARAMS:
-        # Assume there is only one silent param
-        # find the current param position in SILENT_PARAMS
-        index = SILENT_PARAMS.index(p)
-        # return param plus /norestart if /norestart exists in the original params
-        rs = SILENT_PARAMS[index+1] + ((" " + NO_RESTART_PARAM) if NO_RESTART_PARAM in cur_params else "")
-        return rs
-    
-    # If the silent param(s) neither are equal to the entire SILENT_PARAMS list nor equal to one single param in it
-    # return SILENT_PARAMS without the /norestart, indicating that /norestart may be the reason for error code 87
-    return list_of_params_to_string(SILENT_PARAMS)
+        return SILENT_PARAMS[0] + suffix
+
+    p = cur_params[0]
+
+    if p in SILENT_PARAMS:
+        # Get the index of the next parameter in the list
+        next_index = SILENT_PARAMS.index(p)+1
+        if next_index < len(SILENT_PARAMS):
+            return SILENT_PARAMS[next_index] + suffix
+
+    # If all single silent parameters are exhausted
+    # Pass the SILENT_PARAMS without /norestart if /norestart existed in the cur_params
+    # If cur_params does not contain /norestart then return None
+    return list_of_params_to_string(SILENT_PARAMS) if has_no_reboot else None
 
 def list_of_params_to_string(params):
     s = ""

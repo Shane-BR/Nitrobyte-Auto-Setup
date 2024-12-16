@@ -4,8 +4,9 @@ from subprocess import Popen, call
 import sys
 from time import sleep
 
-SILENT_PARAMS = "/s /S -s /q -q /silent -silent /unattended -unattended /quiet -quiet /veryquiet -veryquiet"
+SILENT_PARAMS = ["/s", "/S", "-s", "/q", "-q", "/silent", "-silent", "/unattended", "-unattended", "/quiet", "-quiet", "/veryquiet" "-veryquiet"]
 NO_RESTART_PARAM = "/norestart"
+processes = {}
 
 def main ():
 
@@ -25,14 +26,15 @@ def main ():
         os.system("pause")
         exit(1)
 
+    silent_string = list_of_params_to_string(SILENT_PARAMS)
+
     # skip whitespace and fill dict with paths as key (empty for now)
-    processes = {}
     for path in paths:
 
         if not os.path.isfile(path):
             continue
 
-        process = new_process(path) if not sequential_loading and not is_msi(path) else None
+        process = new_process(path, get_next_params(None)) if not sequential_loading and not is_msi(path) else None
         processes.update({path : process})
 
     # Loop through all processes and see if they are still running or if they are done
@@ -44,8 +46,7 @@ def main ():
         cur_loading = False
         msi_running = False
         install_fails = 0
-        attempted_retries = []
-
+        shedule_retry = []
 
         print("\033[H", end="")
         print('\033[?25l', end="")
@@ -69,29 +70,24 @@ def main ():
                 if is_msi(key):
                     msi_running = True
 
-            elif process.returncode is not 0:
-                p = process
-                if process.returncode is 87:
-                    p = retry_process(process)
+            elif process.returncode is 87: # Incorrect params
+                # Retry with reduced params
+                process = new_process(key, get_next_params(process))
+                cur_loading = True
 
-                if p is None:
-                    print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
-                    install_fails += 1
-                else:
-                    process = p
-                    cur_loading = True
+            elif process.returncode is not 0:
+                print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
+                install_fails += 1
             else:
                 print(name + " - \033[1;32m DONE\033[K")
 
             print("\033[0m", end="")
-        if not cur_loading or (not msi_running and not sequential_loading):
+        if not cur_loading or not sequential_loading:
             # Find next waiting process
             for key in processes: # key = the path to the installer
 
-                handle_next = is_msi(key) if cur_loading else True
-
-                if processes[key] is None and handle_next:
-                    processes[key] = new_process(key)
+                if processes[key] is None and not (is_msi(key) and msi_running):
+                    processes[key] = new_process(key, get_next_params(None)) # None for new process
                     cur_loading = True
                     break
 
@@ -142,40 +138,46 @@ def get_loading_type(t):
     return loading_options["spinning_bar"]
 
 
-def new_process(path):
+def new_process(path, params):
     msi = is_msi(path)
-    process = Popen('msiexec.exe /i "{}" /qn /norestart'.format(os.path.abspath(path))) if msi else Popen(path + " " + SILENT_PARAMS + " " + NO_RESTART_PARAM) # Initial brute force approach
+    process = Popen('msiexec.exe /i "{}" /qn /norestart'.format(os.path.abspath(path))) if msi else Popen(path + " " + params) # Initial brute force approach
     return process
-
-def retry_process(process):
-    params = SILENT_PARAMS.split(" ")
-    no_reboot = True
-
-    while True:
-        # Run through each param with the /noreboot added and then again without it
-        for param in params:
-            if process.returncode is not 87:
-                return process
-
-            r = NO_RESTART_PARAM if no_reboot else ""
-            p = Popen(str(process.args).split(" ")[0] + " " + param + " " + r)
-
-            process = p
-
-            sleep(0.05)
-
-        if no_reboot:
-            no_reboot = False
-        else:
-            break
-
-    return None
         
+def get_next_params(process):
 
+    # If there is no process return SILENT_PARAMS with NO_RESTART_PARAM
+    if process is None:
+        return list_of_params_to_string(SILENT_PARAMS) + " " + NO_RESTART_PARAM
 
-        
+    # pop off the front parameter and return it as a string
+    cur_params = process.args[1:]
 
-        
+    # Equal with or without /norestart
+    equal_silent = True
+    for p in cur_params:
+        if p not in SILENT_PARAMS and p is not NO_RESTART_PARAM:
+            equal_silent = False
+
+    if equal_silent:
+        # Take first param in the list and return it
+        return SILENT_PARAMS[0]
+    elif (p := cur_params[0]) in SILENT_PARAMS:
+        # Assume there is only one silent param
+        # find the current param position in SILENT_PARAMS
+        index = SILENT_PARAMS.index(p)
+        # return param plus /norestart if /norestart exists in the original params
+        return SILENT_PARAMS[index+1] + ((" " + NO_RESTART_PARAM) if NO_RESTART_PARAM in cur_params else "")
+    
+    # If the silent param(s) neither are equal to the entire SILENT_PARAMS list nor equal to one single param in it
+    # return SILENT_PARAMS without the /norestart, indicating that /norestart may be the reason for error code 87
+    return list_of_params_to_string(SILENT_PARAMS)
+
+def list_of_params_to_string(params):
+    s = ""
+    for p in params:
+        s = s + p + " "
+
+    return s
 
 def is_msi(path):
     return os.path.basename(path).endswith("msi")

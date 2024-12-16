@@ -1,6 +1,6 @@
 import json
 import os
-from subprocess import Popen, call
+from subprocess import Popen, call, DEVNULL
 import sys
 from time import sleep
 
@@ -71,7 +71,7 @@ def main ():
 
             elif process.returncode is 87: # Incorrect params
                 # Retry with reduced params
-                process = new_process(key, get_next_params(process))
+                processes[key] = new_process(key, get_next_params(process))
                 cur_loading = True
 
             elif process.returncode is not 0:
@@ -139,7 +139,7 @@ def get_loading_type(t):
 
 def new_process(path, params):
     msi = is_msi(path)
-    process = Popen('msiexec.exe /i "{}" /qn /norestart'.format(os.path.abspath(path))) if msi else Popen(path + " " + params) # Initial brute force approach
+    process = Popen('msiexec.exe /i "{}" /qn /norestart'.format(os.path.abspath(path)), stdout=DEVNULL, stderr=DEVNULL) if msi else Popen(path + " " + params, stdout=DEVNULL, stderr=DEVNULL) # Initial brute force approach
     return process
         
 def get_next_params(process):
@@ -151,10 +151,10 @@ def get_next_params(process):
     # pop off the front parameter and return it as a string
     cur_params = str(process.args).split(" ")[1:]
 
-    # Equal with or without /norestart
+    # Has all silent params with or without /norestart
     equal_silent = True
-    for p in cur_params:
-        if p not in SILENT_PARAMS and p is not NO_RESTART_PARAM:
+    for p in SILENT_PARAMS:
+        if p not in cur_params:
             equal_silent = False
 
     if equal_silent:
@@ -166,7 +166,6 @@ def get_next_params(process):
         index = SILENT_PARAMS.index(p)
         # return param plus /norestart if /norestart exists in the original params
         rs = SILENT_PARAMS[index+1] + ((" " + NO_RESTART_PARAM) if NO_RESTART_PARAM in cur_params else "")
-        print(rs)
         return rs
     
     # If the silent param(s) neither are equal to the entire SILENT_PARAMS list nor equal to one single param in it

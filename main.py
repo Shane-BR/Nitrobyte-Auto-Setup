@@ -1,6 +1,7 @@
 import json
 import os
 from subprocess import Popen, call
+import subprocess
 import sys
 from time import sleep
 
@@ -46,10 +47,9 @@ def main ():
         cur_loading = False
         msi_running = False
         install_fails = 0
-        shedule_retry = []
 
-        print("\033[H", end="")
-        print('\033[?25l', end="")
+        #print("\033[H", end="")
+        #print('\033[?25l', end="")
         loading_index += 1
         for key in processes:
 
@@ -57,14 +57,14 @@ def main ():
             process = processes[key]
 
             if process is None:
-                print(name + " - \033[1;36m Waiting" + "."*(1+(loading_index%3)) + "\033[0m \033[K") # dumb fix - color bleeding onto other text for some reason
+                #print(name + " - \033[1;36m Waiting" + "."*(1+(loading_index%3)) + "\033[0m \033[K") # dumb fix - color bleeding onto other text for some reason
                 continue
 
             process.poll()
             loading_sym = syms[loading_index % len(syms)]
 
             if process.returncode is None:
-                print(name + " - \033[34;1m" + loading_sym + "\033[K")
+                #print(name + " - \033[34;1m" + loading_sym + "\033[K")
                 cur_loading = True
 
                 if is_msi(key):
@@ -76,12 +76,12 @@ def main ():
                 cur_loading = True
 
             elif process.returncode is not 0:
-                print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
+                #print(name + " - \033[1;31m ERR ({})\033[K".format(process.returncode))
                 install_fails += 1
-            else:
-                print(name + " - \033[1;32m DONE\033[K")
+            #else:
+                #print(name + " - \033[1;32m DONE\033[K")
 
-            print("\033[0m", end="")
+            #print("\033[0m", end="")
         if not cur_loading or not sequential_loading:
             # Find next waiting process
             for key in processes: # key = the path to the installer
@@ -96,7 +96,7 @@ def main ():
 
         sleep(0.15)
 
-    print('\033[?25h', end="")
+    #print('\033[?25h', end="")
 
     num_process = len(processes)
     print("\nSuccessfully installed {}/{} programs.".format(num_process-install_fails,num_process))
@@ -140,7 +140,7 @@ def get_loading_type(t):
 
 def new_process(path, params):
     msi = is_msi(path)
-    process = Popen('msiexec.exe /i "{}" /qn /norestart'.format(os.path.abspath(path))) if msi else Popen(path + " " + params) # Initial brute force approach
+    process = Popen('msiexec.exe /i "{}" /qn /norestart'.format(os.path.abspath(path)), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) if msi else Popen(path + " " + params, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) # Initial brute force approach
     return process
         
 def get_next_params(process):

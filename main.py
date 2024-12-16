@@ -72,6 +72,8 @@ def main ():
             elif process.returncode is 87: # Incorrect params
                 # Retry with reduced params
                 processes[key] = new_process(key, get_next_params(process))
+                print(name + " - \033[34;1m" + loading_sym + "\033[K")
+                print("\033[J", end="")
                 cur_loading = True
 
             elif process.returncode is not 0:

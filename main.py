@@ -166,7 +166,9 @@ def get_next_params(process):
         # find the current param position in SILENT_PARAMS
         index = SILENT_PARAMS.index(p)
         # return param plus /norestart if /norestart exists in the original params
-        return SILENT_PARAMS[index+1] + ((" " + NO_RESTART_PARAM) if NO_RESTART_PARAM in cur_params else "")
+        rs = SILENT_PARAMS[index+1] + ((" " + NO_RESTART_PARAM) if NO_RESTART_PARAM in cur_params else "")
+        print(rs)
+        return rs
     
     # If the silent param(s) neither are equal to the entire SILENT_PARAMS list nor equal to one single param in it
     # return SILENT_PARAMS without the /norestart, indicating that /norestart may be the reason for error code 87
